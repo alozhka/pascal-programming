@@ -38,17 +38,11 @@ BEGIN {ReadNumber}
     END;
   IF Digit <> -1 // последним было число
   THEN
-    IF N <= ((MaxINT - Digit) DIV 10)
+    IF N <= ((MaxINT - Digit) DIV 10) //нет переполнения
     THEN
       N := N * 10 + Digit
-    ELSE
+    ELSE                              //будет переполнение
       N := -2;
-  {IF (Digit <> -1) AND ((N * 10 + Digit) <= MaxINT) //проверка последнего символа в файле
-  THEN 
-    N := N * 10 + Digit;
-  IF (Digit <> -1) AND ((N * 10 + Digit) > MaxINT) //переполнение
-  THEN
-    N := -2;}
   IF N = 0  //в числовую строку ничего не добавили, т.е. нет чисел
   THEN
     N := -1;
