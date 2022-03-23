@@ -1,0 +1,19 @@
+PROGRAM RunRCopy(INPUT, OUTPUT);
+
+PROCEDURE RCopy(VAR F, OUTPUT: TEXT);
+VAR
+  Ch: CHAR;
+BEGIN {RCopy}
+  IF NOT EOLN(F)
+  THEN
+    BEGIN
+      READ(F, Ch);
+      WRITE(OUTPUT, Ch);
+      RCopy(F, OUTPUT)
+    END
+END; {RCopy}
+
+BEGIN {RunRCopy}
+  RCopy(INPUT, OUTPUT);
+  WRITELN
+END. {RunRCopy}

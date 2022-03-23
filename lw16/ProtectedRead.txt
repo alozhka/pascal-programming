@@ -1,0 +1,32 @@
+IF NOT EOLN
+  THEN
+    BEGIN {1} 
+      READ(Ch);
+      IF NOT EOLN
+      THEN
+        BEGIN {2}
+          READ(Ch);
+          IF NOT EOLN
+          THEN
+            BEGIN {3}
+              READ(Ch);
+              IF NOT EOLN
+              THEN
+                BEGIN {4}
+                  READ(Ch);
+                  IF NOT EOLN
+                  THEN
+                    BEGIN {5}
+                      READ(Ch);
+                      IF NOT EOLN
+                      THEN
+                        BEGIN {6}      
+                          RESET(INPUT);
+                          ReadMonth(INPUT, Month1);
+                          ReadMonth(INPUT, Month2)
+                        END {6} 
+                    END {5}
+                END {4}
+            END {3}
+        END {2} 
+    END; {1}
