@@ -27,9 +27,7 @@ PROCEDURE ReadNumber(VAR F: TEXT; VAR N: INTEGER);
 VAR
   Digit: INTEGER;
 BEGIN {ReadNumber}
-  IF NOT EOLN(F)
-  THEN
-    ReadDigit(F, Digit);
+  Digit := 0;
   WHILE (NOT EOLN(F)) AND (Digit <> -1) AND (N <= ((MaxINT - Digit) DIV 10)) //не конец строки файле и символ число и нет переполнения
   DO 
     BEGIN

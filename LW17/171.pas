@@ -25,13 +25,11 @@ END; {ReadDigit}
 BEGIN {SumDigits}
   Digit := 0;
   Sum := 0;
-  WHILE NOT EOLN
+  WHILE (NOT EOLN) AND (Digit <> -1)
   DO
     BEGIN
-      ReadDigit(INPUT, Digit);
-      IF Digit <> -1
-      THEN
-        Sum := Sum + Digit
+      Sum := Sum + Digit;
+      ReadDigit(INPUT, Digit)
     END;
   WRITELN(Sum)
 END. {SumDigits}
