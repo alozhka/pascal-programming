@@ -19,7 +19,7 @@ BEGIN{AverageScore}
   WRITELN('Student averages:');
   Student := 1;
   NextScore := 0;
-  WHILE (Student <= ClassSize) AND NOT EOF(F)
+  WHILE (Student <= ClassSize) AND (NOT EOF(F))
   DO 
     BEGIN
       Ch := '#';
@@ -41,7 +41,7 @@ BEGIN{AverageScore}
       READLN(F);
       TotalScore := TotalScore * 10;
       Ave := TotalScore DIV NumberOfScores;
-      IF Ave MOD 10 >= ClassSize
+      IF Ave MOD 10 >= 5
       THEN
         WRITELN(OUTPUT, Ave DIV 10 + 1)
       ELSE

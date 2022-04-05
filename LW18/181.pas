@@ -3,10 +3,10 @@ CONST
   NumberOfScores = 4;
   ClassSize = 4;
 TYPE
-  Score = 0..100;
+  Score = 0 .. 100;
 VAR
-  WhichScore: 1..NumberOfScores;
-  Student: 1..ClassSize;
+  WhichScore: 1 .. NumberOfScores;
+  Student: 1 .. ClassSize;
   NextScore: Score;
   Ave, TotalScore, ClassTotal: INTEGER;
 BEGIN{AverageScore}
@@ -29,7 +29,7 @@ BEGIN{AverageScore}
       READLN;
       TotalScore := TotalScore * 10;
       Ave := TotalScore DIV NumberOfScores;
-      IF Ave MOD 10 >= ClassSize
+      IF Ave MOD 10 >= 5
       THEN
         WRITELN('Average of student: ', Ave DIV 10 + 1)
       ELSE
