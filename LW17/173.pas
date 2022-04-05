@@ -92,12 +92,14 @@ BEGIN {StringToNumbderProcessing}
       ELSE
         WRITELN('[!] Ошибка: неправильный тип данных, либо переполнение')
     END;
+  Sum := Sum*10;
   AvgInt := Sum DIV Counter;
   AvgReal := Sum MOD Counter;
   IF NOT (Num IN [-1, -2])
   THEN
     BEGIN
       WRITELN('Количество: ', Counter, ', минималльный: ', Min, ', максимальный: ', Max);
-      WRITELN('Среднеее арифметическое: ', AvgInt, '.', AvgReal)
+      WRITELN('Среднеее арифметическое: ', AvgInt DIV 10, '.', AvgReal MOD 10);
+      WRITELN(5 MOD 2)
     END
 END. {StringToNumbderProcessing}
