@@ -40,7 +40,7 @@ BEGIN {GraphicalPrinting}
       DO
         BEGIN
           Plenty := InitSymbol(Str[J]);
-          PrintStr(OUTPUT, Plenty, I);
+          PrintStr(OUTPUT, Plenty, I-1);
           WRITE(OUTPUT, ' ');
           J := J + 1
         END;
