@@ -15,21 +15,21 @@ VAR
   WordId, WordValue: ArrayHandler;
   Exchange: UpLowArray;
   TextIn: TEXT;
-  
-FUNCTION WordDefiner(VAR Text: TEXT):STRING;
-VAR
   Word: STRING;
   Ch, State: CHAR;
-  I: INTEGER;
-BEGIN {WordDefiner}
+
+BEGIN
+  REWRITE(TextIn);
+  WRITE(TextIn, '   ABC   DEF');
+  RESET(TextIn);
   State := 'B';
   Word := '';
   WHILE State <> 'F'
   DO
     BEGIN
-      IF NOT EOLN(Text)
+      IF NOT EOLN(TextIn)
       THEN
-        READ(Ch)
+        READ(TextIn, Ch)
       ELSE
         State := 'F';  
       //BEGIN
@@ -40,26 +40,12 @@ BEGIN {WordDefiner}
       IF State = 'W'
       THEN
         BEGIN
-          CASE Ch OF
+          CASE Ch OF       //1.попробовать вставить диапазон для проверки а потом вывод в case 2.сделать с - ответвление 3.отсальное должно работать
             ' ': State := 'F';
             '-': State := 'F'
           ELSE
-            IF Ch IN LowerCase
-            THEN
-              Word := Word + Ch
-            ELSE
-              IF Ch IN UpperCase
-              THEN
-                Word := Word + Exchange[Ch]; 
+            WRITE(Ch)
           END
         END
     END;
-  WordDefiner := Word
-END; {WordDefiner}
-
-BEGIN
-  REWRITE(TextIn);
-  WRITE(TextIn, 'ABC   DEF');
-  RESET(TextIn);
-  WRITELN(WordDefiner(TextIn))
 END.
