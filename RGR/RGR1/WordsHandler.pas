@@ -3,6 +3,22 @@ INTERFACE
   FUNCTION WordDefiner(VAR Text: TEXT):STRING;
 IMPLEMENTATION
 
+CONST
+  UniqueWords = 150;
+TYPE
+  UpperChars = 'À' .. 'ß';
+  LowerChars = 'à' .. 'ÿ';
+  UpperSet = SET OF UpperChars;
+  LowerSet = SET OF LowerChars;
+  ArrayHandler = ARRAY [1 .. UniqueWords] OF STRING;
+  UpLowArray = ARRAY[UpperChars] OF LowerChars;
+  
+VAR
+  UpperCase: UpperSet;
+  LowerCase: LowerSet;
+  WordId, WordValue: ArrayHandler;
+  Exchange: UpLowArray;
+  
 FUNCTION WordDefiner(VAR Text: TEXT):STRING;
 VAR
   Word: STRING;
@@ -16,8 +32,9 @@ BEGIN {WordDefiner}
     BEGIN
       IF NOT EOLN(Text)
       THEN
-        READ(Ch);
-        
+        READ(Ch)
+      ELSE
+        State := 'F';  
       //BEGIN
       IF (State = 'B') AND (Ch <> ' ')
       THEN
@@ -28,12 +45,21 @@ BEGIN {WordDefiner}
         BEGIN
           CASE Ch OF
             ' ': State := 'F';
-            '-': State := '-'
+            '-': State := 'F'
           ELSE
-            Word := Word + Ch
+            IF Ch IN LowerChars
+            THEN
+              Word := Word + Ch
+            ELSE
+              IF Ch IN UpperChars
+              THEN
+                Word := Word + Exchange[Ch]; 
+          END
         END
-    END
+    END;
+  WordDefiner := Word
 END; {WordDefiner}
+
 
 BEGIN {UNIT WordsHndler}
 
