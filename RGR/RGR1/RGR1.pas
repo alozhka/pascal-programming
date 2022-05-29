@@ -2,8 +2,8 @@ PROGRAM CountWords(INPUT, OUTPUT);
 CONST
   UniqueWords = 150;
 TYPE
-  UpperChars = 'А' .. 'Я';
-  LowerChars = 'а' .. 'я';
+  UpperChars = 'A' .. 'Я'; //от английской а до русской
+  LowerChars = 'a' .. 'я'; {--//--}
   UpperSet = SET OF UpperChars;
   LowerSet = SET OF LowerChars;
   ArrayHandler = ARRAY [1 .. UniqueWords] OF STRING;
@@ -15,14 +15,36 @@ VAR
   WordId, WordValue: ArrayHandler;
   Exchange: UpLowArray;
   TextIn: TEXT;
+  
   Word: STRING;
-  Ch, State: CHAR;
+  Ch, Ch1, State: CHAR;
+  CountHyphen: INTEGER;
 
 BEGIN
   REWRITE(TextIn);
-  WRITE(TextIn, '   ABC   DEF');
+  WRITE(TextIn, '   АБВdcK--D--SDS-Ssd  ГДЕ');
   RESET(TextIn);
+  //Объявдение массива
+  Ch1 := 'a';
+  FOR Ch := 'A' TO 'Z'
+  DO
+    BEGIN
+      Exchange[Ch] := Ch1;
+      INC(Ch1)
+    END;
+  Ch1 := 'а';
+  FOR Ch := 'А' TO 'Я' //сначала англ буквы, затем русские
+  DO
+    BEGIN
+      Exchange[Ch] := Ch1;
+      INC(Ch1);
+    END;
+  //Объявление множеств;
+  UpperCase := ['A' .. 'Z'] + ['А' .. 'Я'];
+  LowerCase := ['a' .. 'z'] + ['а' .. 'я'];
+  //бегин
   State := 'B';
+  CountHyphen := 0;
   Word := '';
   WHILE State <> 'F'
   DO
@@ -40,12 +62,43 @@ BEGIN
       IF State = 'W'
       THEN
         BEGIN
-          CASE Ch OF       //1.попробовать вставить диапазон для проверки а потом вывод в case 2.сделать с - ответвление 3.отсальное должно работать
-            ' ': State := 'F';
-            '-': State := 'F'
+          IF (Ch IN LowerCase) OR (Ch IN UpperCase)
+          THEN
+            IF Ch IN LowerCase
+            THEN
+              WRITE(Ch)
+            ELSE
+              WRITE(Exchange[Ch])
           ELSE
-            WRITE(Ch)
-          END
+            IF Ch = '-'
+            THEN
+              State := '-'
+            ELSE
+              State := 'F'
+        END;
+      //Hyphen
+      IF State = '-'
+      THEN
+        BEGIN
+          IF Ch = '-'
+          THEN
+            CountHyphen := CountHyphen + 1;
+          IF (Ch IN UpperCase) OR (Ch IN LowerCase)
+          THEN
+            BEGIN
+              WHILE CountHyphen > 0
+              DO
+                BEGIN
+                  WRITE('-');
+                  CountHyphen := CountHyphen - 1
+                END;
+              IF Ch IN LowerCase
+              THEN
+                WRITE(Ch)
+              ELSE
+                WRITE(Exchange[Ch]);
+              State := 'W'
+            END
         END
-    END;
+    END
 END.
