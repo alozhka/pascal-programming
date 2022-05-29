@@ -1,26 +1,28 @@
 UNIT WordsHandler;
 INTERFACE
-  FUNCTION WordDefiner(VAR Text: TEXT):STRING;
+  FUNCTION WordDefiner(VAR Text: TEXT): STRING;
 IMPLEMENTATION
 
 CONST
   UniqueWords = 150;
 TYPE
-  UpperChars = 'А' .. 'Я';
-  LowerChars = 'а' .. 'я';
+  UpperChars = 'A' .. 'Я';
+  LowerChars = 'a' .. 'я';
   UpperSet = SET OF UpperChars;
   LowerSet = SET OF LowerChars;
+  WordsSet = SET OF STRING; //doesn't work
   ArrayHandler = ARRAY [1 .. UniqueWords] OF STRING;
   UpLowArray = ARRAY[UpperChars] OF LowerChars;
   
 VAR
   UpperCase: UpperSet;
   LowerCase: LowerSet;
+  DefinedWords: WordsSet;
   WordId, WordValue: ArrayHandler;
   Exchange: UpLowArray;
   Key, Value: CHAR;
   
-FUNCTION WordDefiner(VAR Text: TEXT):STRING;
+FUNCTION WordDefiner(VAR Text: TEXT): STRING;
 VAR
   Word: STRING;
   Ch, State: CHAR;
@@ -110,6 +112,6 @@ BEGIN {UNIT WordsHndler}
       INC(Value)
     END;
   //Объявление множеств;
-  UpperCase := ['A' .. 'Z'];
-  LowerCase := ['a' .. 'z'];
+  UpperCase := ['A' .. 'Z'] + ['А' .. 'Я'];
+  LowerCase := ['a' .. 'z'] + ['а' .. 'я']
 END. {UNIT WordsHndler}
