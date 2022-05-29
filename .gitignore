@@ -1,4 +1,4 @@
 
 *.exe
+*.o
 RGR/RGR1/out.txt
-RGR/RGR1/wordshandler.o
