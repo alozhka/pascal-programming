@@ -18,21 +18,23 @@ VAR
   LowerCase: LowerSet;
   WordId, WordValue: ArrayHandler;
   Exchange: UpLowArray;
+  Key, Value: CHAR;
   
 FUNCTION WordDefiner(VAR Text: TEXT):STRING;
 VAR
   Word: STRING;
   Ch, State: CHAR;
-  I: INTEGER;
+  CountHyphen: INTEGER;
 BEGIN {WordDefiner}
   State := 'B';
+  CountHyphen := 0;
   Word := '';
   WHILE State <> 'F'
   DO
     BEGIN
       IF NOT EOLN(Text)
       THEN
-        READ(Ch)
+        READ(Text, Ch)
       ELSE
         State := 'F';  
       //BEGIN
@@ -43,18 +45,48 @@ BEGIN {WordDefiner}
       IF State = 'W'
       THEN
         BEGIN
-          CASE Ch OF
-            ' ': State := 'F';
-            '-': State := 'F'
-          ELSE
-            IF Ch IN LowerChars
+          IF (Ch IN LowerCase) OR (Ch IN UpperCase)
+          THEN
+            IF Ch IN LowerCase
             THEN
               Word := Word + Ch
             ELSE
-              IF Ch IN UpperChars
+              Word := Word + Exchange[Ch]
+          ELSE
+            IF Ch = '-'
+            THEN
+              State := '-'
+            ELSE
+              State := 'F'
+        END;
+      //Hyphen
+      IF State = '-'
+      THEN
+        BEGIN
+          IF (Ch IN UpperCase) OR (Ch IN LowerCase)
+          THEN
+            BEGIN
+              //ѕечать -
+              WHILE CountHyphen > 0
+              DO
+                BEGIN
+                  Word := Word + '-';
+                  CountHyphen := CountHyphen - 1
+                END;
+              //ѕечать последующего дефисам символа и переход в W
+              IF Ch IN LowerCase
               THEN
-                Word := Word + Exchange[Ch]; 
-          END
+                Word := Word + Ch
+              ELSE
+                Word := Word + Exchange[Ch];
+              State := 'W'
+            END
+          ELSE
+            IF Ch = '-'
+            THEN
+              CountHyphen := CountHyphen + 1
+            ELSE
+              State := 'F'
         END
     END;
   WordDefiner := Word
@@ -62,5 +94,22 @@ END; {WordDefiner}
 
 
 BEGIN {UNIT WordsHndler}
-
+  //ќбъ€вдение массива
+  Value := 'a';
+  FOR Key := 'A' TO 'Z'
+  DO
+    BEGIN
+      Exchange[Key] := Value;
+      INC(Value)
+    END;
+  Value := 'а';
+  FOR Key := 'ј' TO 'я' //сначала англ буквы, затем русские
+  DO
+    BEGIN
+      Exchange[Key] := Value;
+      INC(Value)
+    END;
+  //ќбъ€вление множеств;
+  UpperCase := ['A' .. 'Z'];
+  LowerCase := ['a' .. 'z'];
 END. {UNIT WordsHndler}
