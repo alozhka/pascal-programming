@@ -22,7 +22,7 @@ VAR
 
 BEGIN
   REWRITE(TextIn);
-  WRITE(TextIn, '   АБВdcK--D--SDS-Ssd  ГДЕ');
+  WRITE(TextIn, '   АБВdcK--$-DafS-- S  ГДЕ');
   RESET(TextIn);
   //Объявдение массива
   Ch1 := 'a';
@@ -80,9 +80,6 @@ BEGIN
       IF State = '-'
       THEN
         BEGIN
-          IF Ch = '-'
-          THEN
-            CountHyphen := CountHyphen + 1;
           IF (Ch IN UpperCase) OR (Ch IN LowerCase)
           THEN
             BEGIN
@@ -99,6 +96,12 @@ BEGIN
                 WRITE(Exchange[Ch]);
               State := 'W'
             END
+          ELSE
+            IF Ch = '-'
+            THEN
+              CountHyphen := CountHyphen + 1
+            ELSE
+              State := 'F'
         END
     END
 END.
