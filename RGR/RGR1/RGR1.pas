@@ -4,22 +4,28 @@ USES
 CONST
   UniqueWords = 150;
 VAR
-  FIn, FOut: TEXT;
+  Words: ArrayHandler;
   Word: STRING;
-  WordId, CountWords: INTEGER;
+  WordId, CountWords, I: INTEGER;
+  UniqueWord: BOOLEAN;
   
 BEGIN {CountWords}
-  REWRITE(FIn);
+  {REWRITE(FIn);
   WRITE(FIn, '   ÀÁÂdcK--$DafS-- S  ÃÄÅ');
-  RESET(FIn);
-  WHILE NOT EOF(INPUT)
+  RESET(FIn);}
+  I := 1;
+  CountWords := 0;
+  UniqueWord := FALSE;
+  WHILE (NOT EOF(INPUT)) AND (I <= UniqueWords)
   DO
     IF EOLN(INPUT)
     THEN
       READLN(INPUT)
     ELSE
       BEGIN
-        Word := WordDefiner(INPUT);
-        WRITELN(Word)
-      END
+        Words[I].Value := WordDefiner(INPUT);
+        I := I + 1
+      END;
+  TextHandler := Words
+END;
 END. {CountWords}

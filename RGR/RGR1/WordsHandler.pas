@@ -4,21 +4,29 @@ INTERFACE
 IMPLEMENTATION
 
 CONST
-  UniqueWords = 150;
+  TextLength = 500;
+  UniqueWords = 500;
 TYPE
   UpperChars = 'A' .. 'я';
   LowerChars = 'a' .. '€';
   UpperSet = SET OF UpperChars;
   LowerSet = SET OF LowerChars;
-  ArrayHandler = ARRAY [1 .. UniqueWords] OF STRING;
-  UpLowArray = ARRAY[UpperChars] OF LowerChars;
-  
+  WordsRange = 1 .. TextLength;
+  UniqueWordsRange = 1 .. UniqueWords;
+  WordHandle = RECORD
+    Value: STRING;
+    Amount: INTEGER;
+    NextId: WordsRange
+  END;
+  ArrayHandler = ARRAY[UniqueWordsRange] OF WordHandle;
+  ArrayWords = ARRAY[WordsRange] OF STRING;
+  UpLowArray = ARRAY[UpperChars] OF LowerChars;  
 VAR
   UpperCase: UpperSet;
   LowerCase: LowerSet;
-  WordId, WordValue: ArrayHandler;
   Exchange: UpLowArray;
   Key, Value: CHAR;
+
   
 FUNCTION WordDefiner(VAR Text: TEXT): STRING;
 VAR
@@ -99,7 +107,6 @@ BEGIN {WordDefiner}
     END;
   WordDefiner := Word
 END; {WordDefiner}
-
 
 BEGIN {UNIT WordsHndler}
   //ќбъ€вдение массива
