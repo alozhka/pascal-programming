@@ -10,14 +10,12 @@ TYPE
   LowerChars = 'a' .. 'ÿ';
   UpperSet = SET OF UpperChars;
   LowerSet = SET OF LowerChars;
-  WordsSet = SET OF STRING; //doesn't work
   ArrayHandler = ARRAY [1 .. UniqueWords] OF STRING;
   UpLowArray = ARRAY[UpperChars] OF LowerChars;
   
 VAR
   UpperCase: UpperSet;
   LowerCase: LowerSet;
-  DefinedWords: WordsSet;
   WordId, WordValue: ArrayHandler;
   Exchange: UpLowArray;
   Key, Value: CHAR;
@@ -47,6 +45,10 @@ BEGIN {WordDefiner}
       IF State = 'W'
       THEN
         BEGIN
+          CASE Ch OF
+            '¨': Ch := 'Å';
+            '¸': Ch := 'å'
+          END;
           IF (Ch IN LowerCase) OR (Ch IN UpperCase)
           THEN
             IF Ch IN LowerCase
@@ -65,6 +67,10 @@ BEGIN {WordDefiner}
       IF State = '-'
       THEN
         BEGIN
+          CASE Ch OF
+            '¨': Ch := 'Å';
+            '¸': Ch := 'å'
+          END;
           IF (Ch IN UpperCase) OR (Ch IN LowerCase)
           THEN
             BEGIN

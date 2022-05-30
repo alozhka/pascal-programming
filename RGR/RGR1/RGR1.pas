@@ -12,10 +12,14 @@ BEGIN {CountWords}
   REWRITE(FIn);
   WRITE(FIn, '   ÀÁÂdcK--$DafS-- S  ÃÄÅ');
   RESET(FIn);
-  WHILE (NOT EOLN(FIn)) AND
+  WHILE NOT EOF(INPUT)
   DO
-    BEGIN
-      Word := WordDefiner(FIn);
-      WRITELN(Word)
-    END
+    IF EOLN(INPUT)
+    THEN
+      READLN(INPUT)
+    ELSE
+      BEGIN
+        Word := WordDefiner(INPUT);
+        WRITELN(Word)
+      END
 END. {CountWords}
