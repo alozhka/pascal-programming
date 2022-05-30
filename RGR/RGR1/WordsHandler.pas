@@ -24,6 +24,7 @@ TYPE
 VAR
   UpperCase: UpperSet;
   LowerCase: LowerSet;
+  Words: ArrayHandler;
   Exchange: UpLowArray;
   Key, Value: CHAR;
 

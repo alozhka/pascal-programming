@@ -4,10 +4,10 @@ USES
 CONST
   UniqueWords = 150;
 VAR
-  Words: ArrayHandler;
   Word: STRING;
   WordId, CountWords, I: INTEGER;
   UniqueWord: BOOLEAN;
+  Words: ArrayHandler;
   
 BEGIN {CountWords}
   {REWRITE(FIn);
@@ -23,9 +23,7 @@ BEGIN {CountWords}
       READLN(INPUT)
     ELSE
       BEGIN
-        Words[I].Value := WordDefiner(INPUT);
+        Word := WordDefiner(INPUT);
         I := I + 1
-      END;
-  TextHandler := Words
-END;
+      END
 END. {CountWords}
