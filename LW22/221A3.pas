@@ -52,7 +52,7 @@ BEGIN {InsertionSort}
           Arr[Index].Next := Curr;
           IF Prev = 0  {Первый элемент в списке}
           THEN
-            First := Ind ex
+            First := Index
           ELSE
             Arr[Prev].Next := Index
         END
