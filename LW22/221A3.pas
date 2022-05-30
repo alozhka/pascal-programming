@@ -42,13 +42,13 @@ BEGIN {InsertionSort}
           WHILE (Curr <> 0) AND (NOT Found)
           DO
             IF Arr[Index]. Key > Arr[Curr].Key
-              THEN
-                BEGIN
-                  Prev := Curr;
-                  Curr := Arr[Curr].Next
-                END
-              ELSE
-                Found := True;
+            THEN
+              BEGIN
+                Prev := Curr;
+                Curr := Arr[Curr].Next
+              END
+            ELSE
+              Found := True;
           Arr[Index].Next := Curr;
           IF Prev = 0  {Первый элемент в списке}
           THEN
