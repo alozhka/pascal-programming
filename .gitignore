@@ -2,3 +2,6 @@
 *.exe
 *.o
 RGR/RGR1/out.txt
+*.o
+*.gpi
+*.o
