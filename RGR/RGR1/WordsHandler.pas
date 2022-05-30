@@ -3,28 +3,15 @@ INTERFACE
   FUNCTION WordDefiner(VAR Text: TEXT): STRING;
 IMPLEMENTATION
 
-CONST
-  TextLength = 500;
-  UniqueWords = 500;
 TYPE
-  UpperChars = 'A' .. 'Я';
-  LowerChars = 'a' .. 'я';
+  UpperChars = 'A' .. 'Я';//с англ А по русскую Я
+  LowerChars = '`' .. 'я';//идентично
   UpperSet = SET OF UpperChars;
   LowerSet = SET OF LowerChars;
-  WordsRange = 1 .. TextLength;
-  UniqueWordsRange = 1 .. UniqueWords;
-  WordHandle = RECORD
-    Value: STRING;
-    Amount: INTEGER;
-    NextId: WordsRange
-  END;
-  ArrayHandler = ARRAY[UniqueWordsRange] OF WordHandle;
-  ArrayWords = ARRAY[WordsRange] OF STRING;
   UpLowArray = ARRAY[UpperChars] OF LowerChars;  
 VAR
   UpperCase: UpperSet;
   LowerCase: LowerSet;
-  Words: ArrayHandler;
   Exchange: UpLowArray;
   Key, Value: CHAR;
 
@@ -47,7 +34,8 @@ BEGIN {WordDefiner}
       ELSE
         State := 'F';  
       //BEGIN
-      IF (State = 'B') AND (Ch <> ' ')
+      IF (State = 'B') AND 
+        ((Ch IN UpperCase) OR (Ch IN LowerCase))
       THEN
         State := 'W';
       //WORD
@@ -78,7 +66,8 @@ BEGIN {WordDefiner}
         BEGIN
           CASE Ch OF
             'Ё': Ch := 'Е';
-            'ё': Ch := 'е'
+            'ё': Ch := 'е';
+            '''': Ch := '`'
           END;
           IF (Ch IN UpperCase) OR (Ch IN LowerCase)
           THEN
@@ -127,5 +116,5 @@ BEGIN {UNIT WordsHndler}
     END;
   //Объявление множеств;
   UpperCase := ['A' .. 'Z'] + ['А' .. 'Я'];
-  LowerCase := ['a' .. 'z'] + ['а' .. 'я']
+  LowerCase := ['`' .. 'z'] + ['а' .. 'я']
 END. {UNIT WordsHndler}
