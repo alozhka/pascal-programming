@@ -1,29 +1,14 @@
 PROGRAM CountWords(INPUT, OUTPUT);
 USES
-  WordsHandler;
-CONST
-  UniqueWords = 150;
+  TextHandler;
 VAR
-  Word: STRING;
-  WordId, CountWords, I: INTEGER;
-  UniqueWord: BOOLEAN;
-  Words: ArrayHandler;
-  
+  WordsDB: ArrayHandler;
+  I: INTEGER;
+
 BEGIN {CountWords}
-  {REWRITE(FIn);
-  WRITE(FIn, '   ÀÁÂdcK--$DafS-- S  ÃÄÅ');
-  RESET(FIn);}
-  I := 1;
-  CountWords := 0;
-  UniqueWord := FALSE;
-  WHILE (NOT EOF(INPUT)) AND (I <= UniqueWords)
+  WordsDB := TextHandle(INPUT);
+  {FOR I := 1 TO CUniqueWords
   DO
-    IF EOLN(INPUT)
-    THEN
-      READLN(INPUT)
-    ELSE
-      BEGIN
-        Word := WordDefiner(INPUT);
-        I := I + 1
-      END
+    WRITELN(I:2, ' ', WordsDB[I].Value, ' ', WordsDB[I].Amount);}
+  PrintWords(OUTPUT, WordsDB);
 END. {CountWords}
