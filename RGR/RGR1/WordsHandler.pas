@@ -35,7 +35,7 @@ BEGIN {WordDefiner}
         State := 'F';  
       //BEGIN
       IF (State = 'B') AND 
-        ((Ch IN UpperCase) OR (Ch IN LowerCase))
+        ((Ch IN UpperCase) OR (Ch IN LowerCase) OR (Ch = '¨') OR (Ch = '¸'))
       THEN
         State := 'W';
       //WORD
