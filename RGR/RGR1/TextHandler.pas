@@ -8,13 +8,14 @@ TYPE
   UniqueWordsRange = 0 .. UniqueWords;
   WordHandle = RECORD
     Value: STRING;
-    Amount: INTEGER;
-    NextId: WordsRange
+    Amount: INTEGER
   END;
   ArrayHandler = ARRAY[UniqueWordsRange] OF WordHandle;
 VAR
   CUniqueWords: UniqueWordsRange;
+  CWords: WordsRange;
 FUNCTION TextHandle(VAR FIn: TEXT): ArrayHandler;
+PROCEDURE SortWords(VAR Words: ArrayHandler);
 PROCEDURE PrintWords(VAR FOut: TEXT; Arr: ArrayHandler);
 IMPLEMENTATION
 
@@ -27,47 +28,9 @@ VAR
   Key, FirstId:  WordsRange;
 
  
-PROCEDURE SortWords(VAR Arr: ArrayHandler; VAR Index: WordsRange);
-VAR
-  PrevId, CurrId: WordsRange;
-  Found: BOOLEAN;
-BEGIN {SortWords}
-  PrevId := 0;
-  CurrId := FirstId;
-  Found := FALSE;
-  WHILE (CurrId <> 0) AND (NOT Found)
-  DO
-    IF Arr[Index].Value > Arr[CurrId].Value
-    THEN
-      BEGIN
-        PrevId := CurrId;
-        CurrId := Arr[CurrId].NextId
-      END
-    ELSE
-      Found := TRUE;
-  Arr[Index].NextId := CurrId;
-  IF PrevId = 0  {Первый элемент в списке}
-  THEN
-    FirstId := Index
-  ELSE
-    Arr[PrevId].NextId := Index
-END; {SortWords}
-
-FUNCTION IsStringHigher(Str1, Str2: STRING): BOOLEAN;
-VAR
-  I: INTEGER;
-  Sorted: BOOLEAN;
-BEGIN {IsStringBelow}
-  I := 0;
-  {WHILE I <= TextLength
-  DO
-    Sorted := }
-  IsStringHigher := TRUE
-END; {IsStringBelow}
- 
 FUNCTION TextHandle(VAR FIn: TEXT): ArrayHandler;
 VAR
-  CWords, I, Index, J: WordsRange;
+  I, Index, J: WordsRange;
   UniqueWord: BOOLEAN;
   Word: STRING;
 BEGIN {TextHandle}
@@ -105,32 +68,43 @@ BEGIN {TextHandle}
             Words[CUniqueWords].Amount := Words[CUniqueWords].Amount + 1
           END;
         I := I + 1;
-        //It's sorting TIME
-        Index := CUniqueWords;
-        SortWords(Words, Index)
       END;
   TextHandle := Words
 END; {TextHandle}
 
 
+PROCEDURE SortWords(VAR Words: ArrayHandler);
+VAR
+  I, J: INTEGER;
+  Temp: WordHandle;
+BEGIN {SortWords}
+  FOR I := 1 TO CUniqueWords
+  DO
+    FOR J := I + 1 TO CUniqueWords
+    DO
+      IF Words[I].Value > Words[J].Value
+      THEN
+        BEGIN
+          Temp := Words[I];
+          Words[I] := Words[J];
+          Words[J] := Temp
+        END
+END; {SortWords}
+
+
 PROCEDURE PrintWords(VAR FOut: TEXT; Arr: ArrayHandler);
 VAR
-  Index, I: WordsRange;
+  I: WordsRange;
 BEGIN
-  Index := FirstId;
-  I := 0;
-  WHILE Index <> 0
+  FOR I := 1 TO CUniqueWords
   DO
-    BEGIN
-      WRITELN(FOut, I, Arr[Index].Value, ' ', Arr[Index].Amount);
-      INC(I);  
-      Index := Arr[Index].NextId
-    END;
+    WRITELN(FOut, Arr[I].Value, ' ', Arr[I].Amount);
+  WRITELN('Всего слов: ', CWords, ', из них уникальных: ', CUniqueWords)
 END;
 
   
 BEGIN {UNIT TextHandler}
-  Firstid := 1;
+  FirstId := 1;
   FOR Key := 1 TO TextLength
   DO
     Words[Key].Amount := 0
