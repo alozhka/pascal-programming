@@ -21,8 +21,6 @@ IMPLEMENTATION
 
 USES
   WordsHandler;
-TYPE
-  ArrayWords = ARRAY[WordsRange] OF STRING;
 VAR
   Words: ArrayHandler;
   Key, FirstId:  WordsRange;
