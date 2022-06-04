@@ -6,13 +6,16 @@ IMPLEMENTATION
 TYPE
   UpperChars = 'A' .. 'Я';//с англ А по русскую Я
   LowerChars = '`' .. 'я';//идентично
+  NumbersRange = '0' .. '9';
   UpperSet = SET OF UpperChars;
   LowerSet = SET OF LowerChars;
+  NumSet = SET OF NumbersRange;
   UpLowArray = ARRAY[UpperChars] OF LowerChars;  
 VAR
-  UpperCase: UpperSet;
-  LowerCase: LowerSet;
-  Exchange: UpLowArray;
+  UpperCase:  UpperSet;
+  LowerCase:  LowerSet;
+  NumCase:     NumSet;
+  Exchange:   UpLowArray;
   Key, Value: CHAR;
 
   
@@ -35,7 +38,8 @@ BEGIN {WordDefiner}
         State := 'F';  
       //BEGIN
       IF (State = 'B') AND 
-        ((Ch IN UpperCase) OR (Ch IN LowerCase) OR (Ch = 'Ё') OR (Ch = 'ё'))
+        ( (Ch IN UpperCase) OR (Ch IN LowerCase) OR (Ch IN NumCase) 
+        OR (Ch = 'Ё') OR (Ch = 'ё') )
       THEN
         State := 'W';
       //WORD
@@ -46,13 +50,13 @@ BEGIN {WordDefiner}
             'Ё': Ch := 'Е';
             'ё': Ch := 'е'
           END;
-          IF (Ch IN LowerCase) OR (Ch IN UpperCase)
+          IF (Ch IN LowerCase) OR (Ch IN UpperCase) OR (Ch IN NumCase)
           THEN
-            IF Ch IN LowerCase
+            IF Ch IN UpperCase
             THEN
-              Word := Word + Ch
-            ELSE
               Word := Word + Exchange[Ch]
+            ELSE
+              Word := Word + Ch
           ELSE
             IF Ch = '-'
             THEN
@@ -67,7 +71,7 @@ BEGIN {WordDefiner}
           CASE Ch OF
             'Ё': Ch := 'Е';
             'ё': Ch := 'е';
-            '''': Ch := '`'
+            '"': Ch := '`'
           END;
           IF (Ch IN UpperCase) OR (Ch IN LowerCase)
           THEN
@@ -116,5 +120,6 @@ BEGIN {UNIT WordsHndler}
     END;
   //Объявление множеств;
   UpperCase := ['A' .. 'Z'] + ['А' .. 'Я'];
-  LowerCase := ['`' .. 'z'] + ['а' .. 'я']
+  LowerCase := ['`' .. 'z'] + ['а' .. 'я'];
+  NumCase := ['0' .. '9'];
 END. {UNIT WordsHndler}
