@@ -19,7 +19,8 @@ TYPE
 VAR
   CUniqueWords: UniqueWordsRange;
   CWords: WordsRange;
-FUNCTION TextHandle(VAR FIn: TEXT): ArrayHandler;
+PROCEDURE TextHandle(VAR FIn, FOut: TEXT);  //лучше функцией c возвратом FOut, 
+                                            //так логичней выглядит
 PROCEDURE SortWords(VAR Root: Tree; VAR Words: ArrayHandler);
 PROCEDURE PrintTree(VAR FOut: TEXT; Ptr: Tree);
 PROCEDURE PrintWords(VAR FOut: TEXT; Arr: ArrayHandler);
@@ -32,49 +33,71 @@ VAR
   Words: ArrayHandler;
   Key, FirstId:  WordsRange;
 
- 
-FUNCTION TextHandle(VAR FIn: TEXT): ArrayHandler;
+
+FUNCTION CopyCountStrFile(VAR FIn, FOut: TEXT): INTEGER;
 VAR
-  I, Index, J: WordsRange;
+  Ch: CHAR;
+  StrNum: INTEGER;
+BEGIN {CopyCountStrFile}
+  StrNum := 0;
+  WHILE NOT EOF(FIn)
+  DO
+    IF NOT EOLN(FIn)
+    THEN
+      BEGIN
+        READ(FIn, Ch);
+        WRITE(FOut, Ch)
+      END
+    ELSE
+      BEGIN
+        READLN(FIn);
+        StrNum := StrNum + 1;
+        WRITELN(FOut)
+      END;
+  CopyCountStrFile := StrNum
+END; {CopyCountStrFile}
+
+
+PROCEDURE CopyFileInRange(VAR FIn, FOut: TEXT; InitialStr, FinalStr: INTEGER);
+VAR
+  Ch: CHAR;
+  I: INTEGER;
+BEGIN {CopyFileInRange}
+  IF (InitialStr > 0) AND (FinalStr > InitialStr)
+  THEN
+    FOR I := InitialStr TO FinalStr
+    DO
+      BEGIN
+        READ(FIn, Ch);
+        WRITE(FOut, Ch)
+      END
+END; {CopyFileInRange}
+ 
+ 
+PROCEDURE TextHandle(VAR FIn, FOut: TEXT);
+VAR
+  StrNum: LONGINT;
   UniqueWord: BOOLEAN;
   Word: STRING;
+  CopyOut: TEXT;
+  Words: ArrayHandler;
 BEGIN {TextHandle}
-  I := 1;
+  REWRITE(CopyOut);
   CWords := 0;
   CUniqueWords := 0;
-  WHILE (NOT EOF(FIn)) AND (I <= TextLength)
+  WHILE NOT EOF(FIn)
   DO
     IF EOLN(FIn)
     THEN
       READLN(FIn)
     ELSE
-      BEGIN
-        J := 1;
-        Word := WordDefiner(FIn);
-        UniqueWord := TRUE;
-        WHILE J <= TextLength
-        DO
-          BEGIN
-            IF Word = Words[J].Value
-            THEN
-              BEGIN
-                UniqueWord := FALSE;
-                Words[J].Amount := Words[J].Amount + 1;
-                CWords := CWords + 1
-              END;
-            J := J + 1
-          END;
-        IF UniqueWord
-        THEN
-          BEGIN
-            CWords := CWords + 1;
-            CUniqueWords := CUniqueWords + 1;
-            Words[CUniqueWords].Value := Word;
-            Words[CUniqueWords].Amount := Words[CUniqueWords].Amount + 1
-          END;
-        I := I + 1;
-      END;
-  TextHandle := Words
+      IF CUniqueWords > 0
+      THEN
+        BEGIN
+          CopyFileInRange(FIn, FOut, CUniqueWords, StrNum)
+        END
+      ELSE
+        WRITELN(FOut, Word, ' 1');
 END; {TextHandle}
 
 
