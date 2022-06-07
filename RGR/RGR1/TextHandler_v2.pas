@@ -22,7 +22,6 @@ VAR
 FUNCTION TextHandle(VAR FIn: TEXT): ArrayHandler;
 PROCEDURE SortWords(VAR Root: Tree; VAR Words: ArrayHandler);
 PROCEDURE PrintTree(VAR FOut: TEXT; Ptr: Tree);
-PROCEDURE PrintWords(VAR FOut: TEXT; Arr: ArrayHandler);
 IMPLEMENTATION
 
 USES
@@ -108,17 +107,6 @@ BEGIN {SortWords}
   DO
     Insert(Root, Words[I])
 END; {SortWords}
-
-
-PROCEDURE PrintWords(VAR FOut: TEXT; Arr: ArrayHandler);
-VAR
-  I: WordsRange;
-BEGIN
-  FOR I := 1 TO CUniqueWords
-  DO
-    WRITELN(FOut, Arr[I].Value, ' ', Arr[I].Amount);
-  WRITELN('Всего слов: ', CWords, ', из них уникальных: ', CUniqueWords)
-END;
 
 
 PROCEDURE PrintTree(VAR FOut: TEXT; Ptr: Tree);
