@@ -1,104 +1,83 @@
 UNIT TextHandler;
 INTERFACE
-CONST
-  TextLength = 500;
-  UniqueWords = 500;
 TYPE
-  WordsRange = 0 .. TextLength;
-  UniqueWordsRange = 0 .. UniqueWords;
   WordHandle = RECORD
     Value: STRING;
-    Amount: INTEGER
+    Amount: LONGINT
   END;
+  WordsFile = FILE OF WordHandle;
   Tree = ^NodeType;
   NodeType = RECORD
     Word: WordHandle;
     LLink, RLink: Tree
   END;
-  ArrayHandler = ARRAY[UniqueWordsRange] OF WordHandle;
 VAR
-  CUniqueWords: UniqueWordsRange;
-  CWords: WordsRange;
-PROCEDURE TextHandle(VAR FIn, FOut: TEXT);  //лучше функцией c возвратом FOut, 
-                                            //так логичней выглядит
-PROCEDURE SortWords(VAR Root: Tree; VAR Words: ArrayHandler);
+  CUniqueWords, CWords: LONGINT;
+PROCEDURE TextHandle(VAR FIn: TEXT; VAR FW: WordsFile);
+PROCEDURE SortWords(VAR Root: Tree; VAR Words: WordsFile);
+PROCEDURE PrintWords(VAR FOut: TEXT; VAR FW: WordsFile);
 PROCEDURE PrintTree(VAR FOut: TEXT; Ptr: Tree);
-PROCEDURE PrintWords(VAR FOut: TEXT; Arr: ArrayHandler);
 IMPLEMENTATION
+
 
 USES
   WordsHandler;
 VAR
   Root: Tree;
-  Words: ArrayHandler;
-  Key, FirstId:  WordsRange;
-
-
-FUNCTION CopyCountStrFile(VAR FIn, FOut: TEXT): INTEGER;
-VAR
-  Ch: CHAR;
-  StrNum: INTEGER;
-BEGIN {CopyCountStrFile}
-  StrNum := 0;
-  WHILE NOT EOF(FIn)
-  DO
-    IF NOT EOLN(FIn)
-    THEN
-      BEGIN
-        READ(FIn, Ch);
-        WRITE(FOut, Ch)
-      END
-    ELSE
-      BEGIN
-        READLN(FIn);
-        StrNum := StrNum + 1;
-        WRITELN(FOut)
-      END;
-  CopyCountStrFile := StrNum
-END; {CopyCountStrFile}
-
-
-PROCEDURE CopyFileInRange(VAR FIn, FOut: TEXT; InitialStr, FinalStr: INTEGER);
-VAR
-  Ch: CHAR;
-  I: INTEGER;
-BEGIN {CopyFileInRange}
-  IF (InitialStr > 0) AND (FinalStr > InitialStr)
-  THEN
-    FOR I := InitialStr TO FinalStr
-    DO
-      BEGIN
-        READ(FIn, Ch);
-        WRITE(FOut, Ch)
-      END
-END; {CopyFileInRange}
  
  
-PROCEDURE TextHandle(VAR FIn, FOut: TEXT);
+PROCEDURE TextHandle(VAR FIn: TEXT; VAR FW: WordsFile);
 VAR
-  StrNum: LONGINT;
+  Word, CurrWord: WordHandle;
   UniqueWord: BOOLEAN;
-  Word: STRING;
-  CopyOut: TEXT;
-  Words: ArrayHandler;
+  I: LONGINT;
 BEGIN {TextHandle}
-  REWRITE(CopyOut);
-  CWords := 0;
-  CUniqueWords := 0;
-  WHILE NOT EOF(FIn)
+  IF NOT EOLN(FIn)
+  THEN
+    BEGIN
+      Word.Value := WordDefiner(FIn);
+      Word.Amount := 1;
+      WRITE(FW, Word)
+    END;
+  WHILE NOT EOLN(FIn)
   DO
-    IF EOLN(FIn)
-    THEN
-      READLN(FIn)
-    ELSE
-      IF CUniqueWords > 0
+    BEGIN
+      Word.Value := WordDefiner(FIn);
+      RESET(FW);
+      UniqueWord := TRUE;
+      FOR I := 0 TO FileSize(FW)
+      DO
+        BEGIN
+          READ(FW, CurrWord);
+          IF CurrWord.Value = Word.Value
+          THEN
+            BEGIN
+              UniqueWord := FALSE;
+              Seek(FW, I);
+              CurrWord.Amount := CurrWord.Amount + 1;
+              WRITE(FW, CurrWord)
+            END
+        END;
+      IF UniqueWord
       THEN
         BEGIN
-          CopyFileInRange(FIn, FOut, CUniqueWords, StrNum)
+          Seek(FW, FileSize(FW));
+          WRITE(FW, Word)
         END
-      ELSE
-        WRITELN(FOut, Word, ' 1');
+    END
 END; {TextHandle}
+
+PROCEDURE PrintWords(VAR FOut: TEXT; VAR FW: WordsFile);
+VAR
+  Word: WordHandle;
+BEGIN {PrintWords}
+  WHILE NOT EOF(FW)
+  DO
+    BEGIN
+      READ(FW, Word);
+      WRITELN(FOut, Word.Value, ' ', Word.Amount);
+    END 
+END; {PrintWords}
 
 
 PROCEDURE Insert(VAR Ptr: Tree; Data: WordHandle);
@@ -120,25 +99,11 @@ BEGIN {Insert}
 END; {Insert}
 
 
-PROCEDURE SortWords(VAR Root: Tree; VAR Words: ArrayHandler);
+PROCEDURE SortWords(VAR Root: Tree; VAR Words: WordsFile);
 VAR
   I: INTEGER;
 BEGIN {SortWords}
-  FOR I := 1 TO CUniqueWords
-  DO
-    Insert(Root, Words[I])
 END; {SortWords}
-
-
-PROCEDURE PrintWords(VAR FOut: TEXT; Arr: ArrayHandler);
-VAR
-  I: WordsRange;
-BEGIN
-  FOR I := 1 TO CUniqueWords
-  DO
-    WRITELN(FOut, Arr[I].Value, ' ', Arr[I].Amount);
-  WRITELN('Всего слов: ', CWords, ', из них уникальных: ', CUniqueWords)
-END;
 
 
 PROCEDURE PrintTree(VAR FOut: TEXT; Ptr: Tree);
@@ -154,8 +119,4 @@ END; {PrintTree}
 
   
 BEGIN {UNIT TextHandler}
-  FirstId := 1;
-  FOR Key := 1 TO TextLength
-  DO
-    Words[Key].Amount := 0
 END. {UNIT TextHandler}

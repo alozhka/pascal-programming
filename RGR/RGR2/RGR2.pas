@@ -2,12 +2,15 @@ PROGRAM CountWords(INPUT, OUTPUT);
 USES
   TextHandler;
 VAR
-  WordsDB: ArrayHandler;
+  FWords: WordsFile;
   WordsTree: Tree;
 
 BEGIN {CountWords}
+  ASSIGN(FWords, 'WordsDB.dat');
+  REWRITE(FWords);
+  TextHandle(INPUT, FWords);
+  RESET(FWords);
+  PrintWords(OUTPUT, FWords);
   WordsTree := NIL;
-  WordsDB := TextHandle(INPUT);
-  SortWords(WordsTree, WordsDB);
-  PrintTree(OUTPUT, WordsTree)
+  CLOSE(FWords)
 END. {CountWords}
