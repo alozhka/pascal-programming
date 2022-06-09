@@ -15,7 +15,6 @@ TYPE
 VAR
   CWords, CUniqueWords: LONGINT;
 FUNCTION TextHandle(VAR FIn: TEXT): Tree;
-FUNCTION GetFirstTreeElement(VAR Ptr: TREE): WordHandle;
 PROCEDURE PrintTree(VAR FOut: TEXT; Ptr: Tree);
 IMPLEMENTATION
 
