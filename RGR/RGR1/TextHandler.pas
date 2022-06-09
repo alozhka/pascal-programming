@@ -1,8 +1,8 @@
 UNIT TextHandler;
 INTERFACE
 CONST
-  TextLength = 500;
-  UniqueWords = 500;
+  TextLength = 600;
+  UniqueWords = 600;
 TYPE
   WordsRange = 0 .. TextLength;
   UniqueWordsRange = 0 .. UniqueWords;

@@ -1,9 +1,9 @@
 PROGRAM TestTypeFiles(INPUT, OUTPUT);
 USES
-  WordsHandler;
+  TextHandler;
 TYPE
   WordHandle = RECORD
-    Value: STRING;
+    Value: STRING[32];
     Amount: LONGINT
   END;
   WordsFile = FILE OF WordHandle;
@@ -12,24 +12,34 @@ VAR
   Word: WordHandle;
   Str: STRING;
 
+
+{PROCEDURE Init(VAR FIn: TEXT; VAR FW: WordsFile);
 BEGIN
-  {ASSIGN(FWords, 'Test.dat');
-  REWRITE(FWords);
-  
-  Word.Amount := 1;}
-  WHILE NOT EOLN(INPUT)
+  WHILE NOT EOLN(FIn)
   DO
     BEGIN   
-      Str := WordDefiner(INPUT);
-      WRITE(OUTPUT, Str);
-      //WRITE(FWords, Word)
+      Word.Value := WordDefiner(FIn);
+      WRITE(OUTPUT, Word.Value);
+      WRITE(FWords, Word)
+    END
+END;}
+
+BEGIN
+  ASSIGN(FWords, 'Test.dat');
+  REWRITE(FWords);
+  
+  Word.Amount := 1;
+  TextHandle(INPUT, FWords);
+  Seek(FWords, 1);
+  Word.Value := 'd';
+  WRITE(FWords, Word);
+  Seek(FWords, 0);
+  WHILE NOT EOF(FWords)
+  DO
+    BEGIN
+      READ(FWords, Word);
+      WRITELN(Word.Value, ' ', Word.Amount);
     END;
-  
-  {Seek(FWords, 0);
-  Word.Value := '01';
-  Word.Amount := 999;
-  READ(FWords, Word);
-  WRITELN(Word.Value, ' ', Word.Amount);
-  
-  WRITELN(FileSize(FWords))}
+  WRITELN(FileSize(FWords));
+  CLOSE(FWords)
 END.

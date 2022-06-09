@@ -2,15 +2,13 @@ PROGRAM CountWords(INPUT, OUTPUT);
 USES
   TextHandler;
 VAR
-  FWords: WordsFile;
   WordsTree: Tree;
 
 BEGIN {CountWords}
-  ASSIGN(FWords, 'WordsDB.dat');
-  REWRITE(FWords);
-  TextHandle(INPUT, FWords);
-  RESET(FWords);
-  PrintWords(OUTPUT, FWords);
   WordsTree := NIL;
-  CLOSE(FWords)
+  WordsTree := TextHandle(INPUT);
+  PrintTree(OUTPUT, WordsTree);
+  WRITELN('¬сего ', CWords, ' слов, из них уникальных: ', CUniqueWords)
 END. {CountWords}
+//рекомендую почитать формулировку 
+//задани€ rgr и полезный комментарий
