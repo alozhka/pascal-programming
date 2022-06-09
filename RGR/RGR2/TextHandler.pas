@@ -59,7 +59,7 @@ BEGIN {TextHandle}
   Word.Amount := 1;
   TreeGragh := NIL;
   CUniqueWords := 0;
-  WHILE (NOT EOF(FIn)) AND (CUniqueWords <= IterationQuantity)
+  WHILE (NOT EOF(FIn)) AND (CUniqueWords < IterationQuantity)
   DO
     IF EOLN(FIn)
     THEN
