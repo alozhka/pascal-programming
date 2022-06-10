@@ -80,15 +80,59 @@ BEGIN {MergeSortFiles}
     END
   ELSE
     BEGIN
-      IF EOF(F2)
-      THEN
-        WRITE(FOut, Word1);
-      IF EOF(F1)
-      THEN
-        WRITE(FOut, Word2);
+    
+      WasInSort := FALSE;
+      WHILE (NOT EOF(F1)) AND (NOT WasInSort)
+      DO
+        BEGIN
+          IF Word1.Value < Word2.Value
+          THEN
+            BEGIN
+              WRITE(FOut, Word1);
+              READ(F1, Word1)
+            END;
+          IF Word1.Value > Word2.Value
+          THEN
+            BEGIN
+              WRITE(FOut, Word2);
+              WasInSort := TRUE
+            END;
+          IF Word1.Value = Word2.Value
+          THEN
+            BEGIN
+              Word1.Amount := Word1.Amount + Word2.Amount;
+              WRITE(FOut, Word1);
+              WasInSort := TRUE
+            END
+        END;
+        
+      WHILE (NOT EOF(F2)) AND (NOT WasInSort)
+      DO
+        BEGIN
+          IF Word2.Value < Word1.Value
+          THEN
+            BEGIN
+              WRITE(FOut, Word2);
+              READ(F2, Word2)
+            END;
+          IF Word2.Value > Word1.Value
+          THEN
+            BEGIN
+              WRITE(FOut, Word1);
+              WasInSort := TRUE
+            END;
+          IF Word1.Value = Word2.Value
+          THEN
+            BEGIN
+              Word2.Amount := Word2.Amount + Word1.Amount;
+              WRITE(FOut, Word2);
+              WasInSort := TRUE
+            END
+        END;
+        
     END; 
     
-  {Копировать остаток F2 в FOut}
+  {Копировать остаток F1 в FOut}
   WHILE NOT EOF(F1)
   DO
     BEGIN
@@ -96,7 +140,7 @@ BEGIN {MergeSortFiles}
       WRITE(FOut, Word1)
     END;
     
-  {Копировать остаток F3 в FOut}
+  {Копировать остаток F2 в FOut}
   WHILE NOT EOF(F2)
   DO
     BEGIN
@@ -127,6 +171,8 @@ VAR
   FWords, FTemp, FRes: WordsFile;
   Switch: SwitchRange;
 BEGIN {FileTextHandler}
+  CWords := 0;
+  CUniqueWords := 0;
   Switch := 2; //устанавльвает номер temp(1,2).dat файла 
                //для результурующего файла FRes который в switch
   ASSIGN(FWords, 'Data/TreeData.dat');
