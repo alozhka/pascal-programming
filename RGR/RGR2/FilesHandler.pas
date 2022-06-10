@@ -80,55 +80,67 @@ BEGIN {MergeSortFiles}
     END
   ELSE
     BEGIN
-    
       WasInSort := FALSE;
-      WHILE (NOT EOF(F1)) AND (NOT WasInSort)
-      DO
-        BEGIN
-          IF Word1.Value < Word2.Value
+      IF EOF(F2)
+      THEN
+        BEGIN {if}
+          WHILE (NOT EOF(F1)) AND (NOT WasInSort)
+          DO
+            BEGIN {while}
+              IF Word1.Value < Word2.Value
+              THEN
+                BEGIN
+                  WRITE(FOut, Word1);
+                  READ(F1, Word1)
+                END;
+              IF Word1.Value > Word2.Value
+              THEN
+                BEGIN
+                  WRITE(FOut, Word2);
+                  WasInSort := TRUE
+                END;
+              IF Word1.Value = Word2.Value
+              THEN
+                BEGIN
+                  Word1.Amount := Word1.Amount + Word2.Amount;
+                  WRITE(FOut, Word1);
+                  WasInSort := TRUE
+                END  
+            END; {while}
+          IF EOF(F1)
           THEN
-            BEGIN
-              WRITE(FOut, Word1);
-              READ(F1, Word1)
-            END;
-          IF Word1.Value > Word2.Value
+            WRITE(FOut, Word2)
+        END; {if}
+      IF EOF(F1)
+      THEN
+        BEGIN {if}
+          WHILE (NOT EOF(F2)) AND (NOT WasInSort)
+          DO
+            BEGIN {while}
+              IF Word2.Value < Word1.Value
+              THEN
+                BEGIN
+                  WRITE(FOut, Word2);
+                  READ(F2, Word2)
+                END;
+              IF Word2.Value > Word1.Value
+              THEN
+                BEGIN
+                  WRITE(FOut, Word1);
+                  WasInSort := TRUE
+                END;
+              IF Word1.Value = Word2.Value
+              THEN
+                BEGIN
+                  Word2.Amount := Word2.Amount + Word1.Amount;
+                  WRITE(FOut, Word2);
+                  WasInSort := TRUE
+                END;
+            END; {while}
+          IF EOF(F2)
           THEN
-            BEGIN
-              WRITE(FOut, Word2);
-              WasInSort := TRUE
-            END;
-          IF Word1.Value = Word2.Value
-          THEN
-            BEGIN
-              Word1.Amount := Word1.Amount + Word2.Amount;
-              WRITE(FOut, Word1);
-              WasInSort := TRUE
-            END
-        END;
-        
-      WHILE (NOT EOF(F2)) AND (NOT WasInSort)
-      DO
-        BEGIN
-          IF Word2.Value < Word1.Value
-          THEN
-            BEGIN
-              WRITE(FOut, Word2);
-              READ(F2, Word2)
-            END;
-          IF Word2.Value > Word1.Value
-          THEN
-            BEGIN
-              WRITE(FOut, Word1);
-              WasInSort := TRUE
-            END;
-          IF Word1.Value = Word2.Value
-          THEN
-            BEGIN
-              Word2.Amount := Word2.Amount + Word1.Amount;
-              WRITE(FOut, Word2);
-              WasInSort := TRUE
-            END
-        END;
+            WRITE(FOut, Word1)
+        END {if}
         
     END; 
     
