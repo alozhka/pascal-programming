@@ -90,10 +90,10 @@ BEGIN {Merge}
   WHILE NOT (EOLN(F3))
   DO
     BEGIN
-      READ(F1, Ch2);
-      WRITE(F3, Ch2)
+      READ(F3, Ch2);
+      WRITE(F1, Ch2)
     END;
-  WRITELN(F1);
+  WRITELN(F1)
 END; {Merge}
 
 PROCEDURE RecursiveSort(VAR F1: TEXT);
