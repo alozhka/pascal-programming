@@ -1,7 +1,7 @@
 UNIT TextHandler;
 INTERFACE
 CONST
-  IterationQuantity = 250;
+  IterationQuantity = 5;
 TYPE
   WordHandle = RECORD
     Value: STRING[32];
@@ -65,9 +65,13 @@ BEGIN {TextHandle}
       READLN(FIn)
     ELSE
       BEGIN
-        CWords := CWords + 1;
         Word.Value := WordDefiner(FIn);
-        Insert(TreeGragh, Word)
+        IF Word.Value <> ''
+        THEN
+          BEGIN
+            Insert(TreeGragh, Word); 
+            CWords := CWords + 1
+          END
       END;
   TextHandle := TreeGragh
 END; {TextHandle}
