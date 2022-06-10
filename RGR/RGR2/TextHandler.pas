@@ -14,6 +14,7 @@ TYPE
   END;
 VAR
   CWords, CUniqueWords: LONGINT;
+  CIterWords: INTEGER;
 FUNCTION TextHandle(VAR FIn: TEXT): Tree;
 PROCEDURE PrintTree(VAR FOut: TEXT; Ptr: Tree);
 IMPLEMENTATION
@@ -21,8 +22,6 @@ IMPLEMENTATION
 
 USES
   WordsHandler;
-VAR
-  Root: Tree;
 
 
 PROCEDURE Insert(VAR Ptr: Tree; Data: WordHandle);
@@ -34,7 +33,7 @@ BEGIN {Insert}
       Ptr^.Word := Data;
       Ptr^.LLink := NIL;
       Ptr^.RLink := NIL;
-      CUniqueWords := CUniqueWords + 1
+      CIterWords := CIterWords + 1
     END
   ELSE
     BEGIN
@@ -58,8 +57,8 @@ VAR
 BEGIN {TextHandle}
   Word.Amount := 1;
   TreeGragh := NIL;
-  CUniqueWords := 0;
-  WHILE (NOT EOF(FIn)) AND (CUniqueWords < IterationQuantity)
+  CIterWords := 0;
+  WHILE (NOT EOF(FIn)) AND (CIterWords < IterationQuantity)
   DO
     IF EOLN(FIn)
     THEN
