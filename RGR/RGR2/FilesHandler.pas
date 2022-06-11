@@ -26,16 +26,22 @@ END; {PrintTree}
 PROCEDURE MergeSortFiles(VAR FOut, F1, F2: WordsFile);
 VAR
   Word1, Word2: WordHandle;
-  WasInSort: BOOLEAN;
+  WasInSort, Is1Defined, Is2Defined: BOOLEAN;
 BEGIN {MergeSortFiles}
   WasInSort := FALSE;
+  Is1Defined := TRUE;
+  Is2Defined := TRUE;
 
   IF NOT EOF(F1)
   THEN
-    READ(F1, Word1);
+    READ(F1, Word1)
+  ELSE
+    Is1Defined := FALSE;
   IF NOT EOF(F2)
   THEN
-    READ(F2, Word2);
+    READ(F2, Word2)
+  ELSE
+    Is2Defined := FALSE;
     
   WHILE (NOT EOF(F1)) AND (NOT EOF(F2))
   DO
@@ -67,10 +73,10 @@ BEGIN {MergeSortFiles}
     BEGIN
       IF Word1.Value < Word2.Value
       THEN
-        WRITE(FOut, Word1, Word2);
+        WRITE(FOut, Word1);
       IF Word1.Value > Word2.Value
       THEN
-        WRITE(FOut, Word2, Word1);
+        WRITE(FOut, Word2);
       IF Word1.Value = Word2.Value
       THEN
         BEGIN
@@ -107,6 +113,25 @@ BEGIN {MergeSortFiles}
                   WasInSort := TRUE
                 END  
             END; {while}
+          IF Word1.Value < Word2.Value
+          THEN
+            BEGIN
+              WRITE(FOut, Word1);
+              READ(F1, Word1)
+            END;
+          IF Word1.Value > Word2.Value
+          THEN
+            BEGIN
+              WRITE(FOut, Word2);
+              WasInSort := TRUE
+            END;
+          IF Word1.Value = Word2.Value
+          THEN
+            BEGIN
+              Word1.Amount := Word1.Amount + Word2.Amount;
+              WRITE(FOut, Word1);
+              WasInSort := TRUE
+            END; 
           IF EOF(F1)
           THEN
             WRITE(FOut, Word2)
@@ -137,6 +162,25 @@ BEGIN {MergeSortFiles}
                   WasInSort := TRUE
                 END;
             END; {while}
+          IF Word1.Value < Word2.Value
+          THEN
+            BEGIN
+              WRITE(FOut, Word1);
+              READ(F1, Word1)
+            END;
+          IF Word1.Value > Word2.Value
+          THEN
+            BEGIN
+              WRITE(FOut, Word2);
+              WasInSort := TRUE
+            END;
+          IF Word1.Value = Word2.Value
+          THEN
+            BEGIN
+              Word1.Amount := Word1.Amount + Word2.Amount;
+              WRITE(FOut, Word1);
+              WasInSort := TRUE
+            END; 
           IF EOF(F2)
           THEN
             WRITE(FOut, Word1)
