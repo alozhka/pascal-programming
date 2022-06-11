@@ -23,6 +23,19 @@ BEGIN {PrintTree}
 END; {PrintTree}   
 
 
+PROCEDURE CopyTypeFile(VAR FIn, FOut: WordsFile);
+VAR
+  Word: WordHandle;
+BEGIN {CopyTipeFile}
+  WHILE NOT EOF(FIn)
+  DO
+    BEGIN
+      READ(FIn, Word);
+      WRITE(FOut, Word)
+    END
+END; {CopyTipeFile}
+
+
 PROCEDURE MergeSortFiles(VAR FOut, F1, F2: WordsFile);
 VAR
   Word1, Word2: WordHandle;
@@ -68,6 +81,7 @@ BEGIN {MergeSortFiles}
           READ(F2, Word2)
         END
     END;
+    
   IF WasInSort
   THEN
     BEGIN
@@ -83,111 +97,103 @@ BEGIN {MergeSortFiles}
           Word1.Amount := Word1.Amount + Word2.Amount;
           WRITE(FOut, Word1)
         END
-    END
-  ELSE
-    BEGIN
-      WasInSort := FALSE;
-      IF EOF(F2)
-      THEN
-        BEGIN {if}
-          WHILE (NOT EOF(F1)) AND (NOT WasInSort)
-          DO
-            BEGIN {while}
-              IF Word1.Value < Word2.Value
-              THEN
-                BEGIN
-                  WRITE(FOut, Word1);
-                  READ(F1, Word1)
-                END;
-              IF Word1.Value > Word2.Value
-              THEN
-                BEGIN
-                  WRITE(FOut, Word2);
-                  WasInSort := TRUE
-                END;
-              IF Word1.Value = Word2.Value
-              THEN
-                BEGIN
-                  Word1.Amount := Word1.Amount + Word2.Amount;
-                  WRITE(FOut, Word1);
-                  WasInSort := TRUE
-                END  
-            END; {while}
-          IF Word1.Value < Word2.Value
-          THEN
-            BEGIN
-              WRITE(FOut, Word1);
-              READ(F1, Word1)
-            END;
-          IF Word1.Value > Word2.Value
-          THEN
-            BEGIN
-              WRITE(FOut, Word2);
-              WasInSort := TRUE
-            END;
-          IF Word1.Value = Word2.Value
-          THEN
-            BEGIN
-              Word1.Amount := Word1.Amount + Word2.Amount;
-              WRITE(FOut, Word1);
-              WasInSort := TRUE
-            END; 
-          IF EOF(F1)
-          THEN
-            WRITE(FOut, Word2)
-        END; {if}
-      IF EOF(F1)
-      THEN
-        BEGIN {if}
-          WHILE (NOT EOF(F2)) AND (NOT WasInSort)
-          DO
-            BEGIN {while}
-              IF Word2.Value < Word1.Value
-              THEN
-                BEGIN
-                  WRITE(FOut, Word2);
-                  READ(F2, Word2)
-                END;
-              IF Word2.Value > Word1.Value
-              THEN
-                BEGIN
-                  WRITE(FOut, Word1);
-                  WasInSort := TRUE
-                END;
-              IF Word1.Value = Word2.Value
-              THEN
-                BEGIN
-                  Word2.Amount := Word2.Amount + Word1.Amount;
-                  WRITE(FOut, Word2);
-                  WasInSort := TRUE
-                END;
-            END; {while}
-          IF Word1.Value < Word2.Value
-          THEN
-            BEGIN
-              WRITE(FOut, Word1);
-              READ(F1, Word1)
-            END;
-          IF Word1.Value > Word2.Value
-          THEN
-            BEGIN
-              WRITE(FOut, Word2);
-              WasInSort := TRUE
-            END;
-          IF Word1.Value = Word2.Value
-          THEN
-            BEGIN
-              Word1.Amount := Word1.Amount + Word2.Amount;
-              WRITE(FOut, Word1);
-              WasInSort := TRUE
-            END; 
-          IF EOF(F2)
-          THEN
-            WRITE(FOut, Word1)
-        END {if}
-        
-    END; 
+    END;
     
+  IF NOT WasInSort
+  THEN
+    IF Is1Defined AND Is2Defined
+    THEN
+      BEGIN {Defined}
+        WasInSort := FALSE;
+          //F2
+        IF EOF(F2)
+        THEN
+          BEGIN {if}
+            WHILE (NOT EOF(F1)) AND (NOT WasInSort)
+            DO
+              BEGIN {while}
+                IF Word1.Value < Word2.Value
+                THEN
+                  BEGIN
+                    WRITE(FOut, Word1);
+                    READ(F1, Word1)
+                  END;
+                IF Word1.Value > Word2.Value
+                THEN
+                  BEGIN
+                    WRITE(FOut, Word2);
+                    WasInSort := TRUE
+                  END;
+                IF Word1.Value = Word2.Value
+                THEN
+                  BEGIN
+                    Word1.Amount := Word1.Amount + Word2.Amount;
+                    WRITE(FOut, Word1);
+                    WasInSort := TRUE
+                  END  
+              END; {while}
+            IF EOF(F1)
+            THEN
+              BEGIN {EOF(F1)}
+                IF Word1.Value = Word2.Value
+                THEN
+                  BEGIN
+                    Word2.Amount := Word1.Amount + Word2.Amount;
+                    WRITE(FOut, Word2);
+                  END;
+                IF Word1.Value < Word2.Value
+                THEN
+                  WRITE(FOut, Word1);
+                IF Word1.Value > Word2.Value
+                THEN
+                  WRITE(FOut, Word2)
+              END {EOF(F1)}
+          END; {if}
+          //F1
+        IF EOF(F1)
+        THEN
+          BEGIN {if}
+            WHILE (NOT EOF(F2)) AND (NOT WasInSort)
+            DO
+              BEGIN {while}
+                IF Word2.Value < Word1.Value
+                THEN
+                  BEGIN
+                    WRITE(FOut, Word2);
+                    READ(F2, Word2)
+                  END;
+                IF Word2.Value > Word1.Value
+                THEN
+                  BEGIN
+                    WRITE(FOut, Word1);
+                    WasInSort := TRUE
+                  END;
+                IF Word1.Value = Word2.Value
+                THEN
+                  BEGIN
+                    Word2.Amount := Word2.Amount + Word1.Amount;
+                    WRITE(FOut, Word2);
+                    WasInSort := TRUE
+                  END;
+              END; {while}
+            IF EOF(F2)
+            THEN
+              BEGIN
+                IF Word1.Value = Word2.Value
+                THEN
+                  BEGIN
+                    Word1.Amount := Word1.Amount + Word2.Amount;
+                    WRITE(FOut, Word1);
+                  END;
+                IF Word1.Value < Word2.Value
+                THEN
+                  WRITE(FOut, Word1);
+                IF Word1.Value > Word2.Value
+                THEN
+                  WRITE(FOut, Word2)
+              END
+          END {if}
+      END; {Defined}
   {Копировать остаток F1 в FOut}
   WHILE NOT EOF(F1)
   DO
