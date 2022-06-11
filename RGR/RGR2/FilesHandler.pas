@@ -39,9 +39,8 @@ END; {CopyTipeFile}
 PROCEDURE MergeSortFiles(VAR FOut, F1, F2: WordsFile);
 VAR
   Word1, Word2: WordHandle;
-  WasInSort, Is1Defined, Is2Defined: BOOLEAN;
+  InSort, Is1Defined, Is2Defined: BOOLEAN;
 BEGIN {MergeSortFiles}
-  WasInSort := FALSE;
   Is1Defined := TRUE;
   Is2Defined := TRUE;
 
@@ -56,60 +55,161 @@ BEGIN {MergeSortFiles}
   ELSE
     Is2Defined := FALSE;
     
-  WHILE (NOT EOF(F1)) AND (NOT EOF(F2))
-  DO
-    BEGIN
-      WasInSort := TRUE;
-      IF Word1.Value < Word2.Value
-      THEN
-        BEGIN
+  IF Is1Defined AND Is2Defined
+  THEN
+    IF (NOT EOF(F1)) AND (NOT EOF(F2))
+    THEN  //files have 2 and more symbols
+   {1}BEGIN
+        WHILE (NOT EOF(F1)) AND (NOT EOF(F2))
+        DO
+          BEGIN
+            IF Word1.Value < Word2.Value
+            THEN
+              BEGIN
+                WRITE(FOut, Word1);
+                READ(F1, Word1)
+              END;
+            IF Word1.Value > Word2.Value
+            THEN
+              BEGIN
+                WRITE(FOut, Word2);
+                READ(F2, Word2)
+              END;
+            IF Word1.Value = Word2.Value
+            THEN
+              BEGIN
+                Word1.Amount := Word1.Amount + Word2.Amount;
+                WRITE(FOut, Word1);
+                READ(F1, Word1);
+                READ(F2, Word2)
+              END
+          END;
+        WHILE (NOT EOF(F1)) AND (NOT EOF(F2))
+        DO
+          BEGIN
+            IF Word1.Value < Word2.Value
+            THEN
+              BEGIN
+                WRITE(FOut, Word1);
+                READ(F1, Word1)
+              END;
+            IF Word1.Value > Word2.Value
+            THEN
+              BEGIN
+                WRITE(FOut, Word2);
+                READ(F2, Word2)
+              END;
+            IF Word1.Value = Word2.Value
+            THEN
+              BEGIN
+                Word1.Amount := Word1.Amount + Word2.Amount;
+                WRITE(FOut, Word1);
+                READ(F1, Word1);
+                READ(F2, Word2)
+              END
+          END;
+          WHILE NOT EOF(F1)
+          DO
+          BEGIN
+            IF Word1.Value < Word2.Value
+            THEN
+              BEGIN
+                WRITE(FOut, Word1);
+                READ(F1, Word1)
+              END;
+            IF Word1.Value > Word2.Value
+            THEN
+              WRITE(FOut, Word2);
+            IF Word1.Value = Word2.Value
+            THEN
+              BEGIN
+                Word1.Amount := Word1.Amount + Word2.Amount;
+                WRITE(FOut, Word1);
+                READ(F1, Word1)
+              END
+          END;
+        {last iteration}
+        IF Word1.Value < Word2.Value
+        THEN
           WRITE(FOut, Word1);
-          READ(F1, Word1)
-        END;
-      IF Word1.Value > Word2.Value
-      THEN
-        BEGIN
+        IF Word1.Value > Word2.Value
+        THEN
           WRITE(FOut, Word2);
-          READ(F2, Word2)
-        END;
-      IF Word1.Value = Word2.Value
-      THEN
-        BEGIN
-          Word1.Amount := Word1.Amount + Word2.Amount;
-          WRITE(FOut, Word1);
-          READ(F1, Word1);
-          READ(F2, Word2)
-        END
-    END;
-    
-  IF WasInSort
-  THEN
-    BEGIN
-      IF Word1.Value < Word2.Value
-      THEN
-        WRITE(FOut, Word1);
-      IF Word1.Value > Word2.Value
-      THEN
-        WRITE(FOut, Word2);
-      IF Word1.Value = Word2.Value
-      THEN
-        BEGIN
-          Word1.Amount := Word1.Amount + Word2.Amount;
-          WRITE(FOut, Word1)
-        END
-    END;
-    
-  IF NOT WasInSort
-  THEN
-    IF Is1Defined AND Is2Defined
-    THEN
-      BEGIN {Defined}
-        WasInSort := FALSE;
-          //F2
+        IF Word1.Value = Word2.Value
+        THEN
+          BEGIN
+            Word1.Amount := Word1.Amount + Word2.Amount;
+            WRITE(FOut, Word1)
+          END;
+        {copy remains F2 in FOut}
+        WHILE NOT EOF(F1)
+        DO
+          BEGIN
+            READ(F1, Word1);
+            WRITE(FOut, Word1)
+          END;
+        {copy remains F2 in FOut}
+        WHILE NOT EOF(F2)
+        DO
+          BEGIN
+            READ(F2, Word2);
+            WRITE(FOut, Word2)
+          END   
+   {1}END
+    ELSE  //at least one among files have only one symbol
+   {2}BEGIN
+        InSort := TRUE;
+        {F1 has only 1 symbol}
+        IF EOF(F1)
+        THEN
+          BEGIN {if}
+            WHILE (NOT EOF(F2)) AND (NOT InSort)
+            DO
+              BEGIN {while}
+                IF Word2.Value < Word1.Value
+                THEN
+                  BEGIN
+                    WRITE(FOut, Word2);
+                    READ(F2, Word2)
+                  END;
+                IF Word2.Value > Word1.Value
+                THEN
+                  BEGIN
+                    WRITE(FOut, Word1);
+                    InSort := TRUE
+                  END;
+                IF Word1.Value = Word2.Value
+                THEN
+                  BEGIN
+                    Word2.Amount := Word2.Amount + Word1.Amount;
+                    WRITE(FOut, Word2);
+                    InSort := TRUE
+                  END;
+              END; {while}
+            IF EOF(F2)
+            THEN
+              BEGIN {EOF(F2)}
+                IF Word1.Value = Word2.Value
+                THEN
+                  BEGIN
+                    Word1.Amount := Word1.Amount + Word2.Amount;
+                    WRITE(FOut, Word1);
+                  END;
+                IF Word1.Value < Word2.Value
+                THEN
+                  WRITE(FOut, Word1);
+                IF Word1.Value > Word2.Value
+                THEN
+                  WRITE(FOut, Word2)
+              END {EOF(F2)}
+            ELSE
+              CopyTypeFile(F2, FOut)
+          END; {if}
+        {F2 has only 1 symbol}
         IF EOF(F2)
         THEN
           BEGIN {if}
-            WHILE (NOT EOF(F1)) AND (NOT WasInSort)
+            WHILE (NOT EOF(F1)) AND InSort
             DO
               BEGIN {while}
                 IF Word1.Value < Word2.Value
@@ -122,14 +222,14 @@ BEGIN {MergeSortFiles}
                 THEN
                   BEGIN
                     WRITE(FOut, Word2);
-                    WasInSort := TRUE
+                    InSort := FALSE
                   END;
                 IF Word1.Value = Word2.Value
                 THEN
                   BEGIN
                     Word1.Amount := Word1.Amount + Word2.Amount;
                     WRITE(FOut, Word1);
-                    WasInSort := TRUE
+                    InSort := FALSE
                   END  
               END; {while}
             IF EOF(F1)
@@ -148,67 +248,25 @@ BEGIN {MergeSortFiles}
                 THEN
                   WRITE(FOut, Word2)
               END {EOF(F1)}
-          END; {if}
-          //F1
-        IF EOF(F1)
-        THEN
-          BEGIN {if}
-            WHILE (NOT EOF(F2)) AND (NOT WasInSort)
-            DO
-              BEGIN {while}
-                IF Word2.Value < Word1.Value
-                THEN
-                  BEGIN
-                    WRITE(FOut, Word2);
-                    READ(F2, Word2)
-                  END;
-                IF Word2.Value > Word1.Value
-                THEN
-                  BEGIN
-                    WRITE(FOut, Word1);
-                    WasInSort := TRUE
-                  END;
-                IF Word1.Value = Word2.Value
-                THEN
-                  BEGIN
-                    Word2.Amount := Word2.Amount + Word1.Amount;
-                    WRITE(FOut, Word2);
-                    WasInSort := TRUE
-                  END;
-              END; {while}
-            IF EOF(F2)
-            THEN
-              BEGIN
-                IF Word1.Value = Word2.Value
-                THEN
-                  BEGIN
-                    Word1.Amount := Word1.Amount + Word2.Amount;
-                    WRITE(FOut, Word1);
-                  END;
-                IF Word1.Value < Word2.Value
-                THEN
-                  WRITE(FOut, Word1);
-                IF Word1.Value > Word2.Value
-                THEN
-                  WRITE(FOut, Word2)
-              END
+            ELSE
+              CopyTypeFile(F1, FOut)
           END {if}
-      END; {Defined}
-  {Копировать остаток F1 в FOut}
-  WHILE NOT EOF(F1)
-  DO
-    BEGIN
-      READ(F1, Word1);
-      WRITE(FOut, Word1)
-    END;
-    
-  {Копировать остаток F2 в FOut}
-  WHILE NOT EOF(F2)
-  DO
-    BEGIN
-      READ(F2, Word2);
-      WRITE(FOut, Word2)
-    END;
+   {2}END
+  ELSE    // someone is not defined
+ {3}BEGIN  
+      IF Is1Defined
+      THEN
+        BEGIN
+          RESET(F1);
+          CopyTypeFile(F1, FOut)
+        END;
+      IF Is2Defined
+      THEN
+        BEGIN
+          RESET(F2);
+          CopyTypeFile(F2, FOut)
+        END
+ {3}END
      
 END; {MergeSortFiles}
 
@@ -271,6 +329,8 @@ BEGIN {FileTextHandler}
       RESET(FTemp);
       REWRITE(FRes);
       MergeSortFiles(FRes, FWords, FTemp);
+      PrintTree(OUTPUT, WTree);
+      WRITELN(OUTPUT);
       DISPOSE(WTree);
       WTree := TextHandle(FIn)
     END;
