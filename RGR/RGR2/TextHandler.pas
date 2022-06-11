@@ -13,7 +13,7 @@ TYPE
     LLink, RLink: Tree
   END;
 VAR
-  CWords, CUniqueWords: LONGINT;
+  CWords: LONGINT;
   CIterWords: INTEGER;
 FUNCTION TextHandle(VAR FIn: TEXT): Tree;
 PROCEDURE PrintTree(VAR FOut: TEXT; Ptr: Tree);
@@ -90,6 +90,5 @@ END; {PrintTree}
 
   
 BEGIN {UNIT TextHandler}
-  CWords := 0;
-  CUniqueWords := 0;
+  CWords := 0
 END. {UNIT TextHandler}
