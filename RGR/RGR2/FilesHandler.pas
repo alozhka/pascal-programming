@@ -38,90 +38,76 @@ END; {CopyTipeFile}
 
 PROCEDURE MergeSortFiles(VAR FOut, F1, F2: WordsFile);
 VAR
-  Word1, Word2: WordHandle;
-  HadSort, Is1Defined, Is2Defined: BOOLEAN;
+  W1, W2: WordHandle;
+  State: STRING[10];
 BEGIN {MergeSortFiles}
-  Is1Defined := TRUE;
-  Is2Defined := TRUE;
-  IF NOT EOF(F1)
+  IF EOF(F1) AND EOF(F2)
   THEN
-    READ(F1, Word1)
-  ELSE
-    Is1Defined := FALSE;
-  IF NOT EOF(F2)
+    State := 'Finish';
+  IF EOF(F1) OR  EOF(F2)
   THEN
-    READ(F2, Word2)
+    State := 'Copy Tail'
   ELSE
-    Is2Defined := FALSE;
-  IF Is1Defined AND Is2Defined
+    State := 'In Sort';
+    
+  IF State = 'In Sort'
   THEN
     BEGIN
-      WHILE (NOT EOF(F1)) AND (NOT EOF(F2))
+      W1.Value := '*';
+      W2.Value := '*';
+      WHILE ( (NOT EOF(F1)) AND ( NOT EOF(F2) )                              ) OR
+            ( (NOT EOF(F1)) AND (W1.Value <= W2.Value) AND (W2.Value <> '*') ) OR
+            ( (NOT EOF(F2)) AND (W2.Value <= W1.Value) AND (W1.Value <> '*') )
       DO
         BEGIN
-          IF Word1.Value < Word2.Value
+          IF (NOT EOF(F1)) AND (W1.Value = '*')
+          THEN
+            READ(F1, W1);
+          IF (NOT EOF(F2)) AND (W2.Value = '*')
+          THEN
+            READ(F2, W2);
+          IF W1.Value < W2.Value
           THEN
             BEGIN
-              WRITE(FOut, Word1);
-              READ(F1, Word1)
-            END;
-          IF Word1.Value > Word2.Value
-          THEN
-            BEGIN                                
-              WRITE(FOut, Word2);
-              READ(F2, Word2)
-            END;
-          IF Word1.Value = Word2.Value
-          THEN
-            BEGIN
-              Word1.Amount := Word1.Amount + Word2.Amount;
-              WRITE(FOut, Word1);
-              READ(F1, Word1);
-              READ(F2, Word2)
-            END;
+              WRITE(FOut, W1);
+              W1.Value := '*'
+            END
+          ELSE
+            IF W2.Value < W1.Value
+            THEN
+              BEGIN
+                WRITE(FOut, W2);
+                W2.Value := '*'
+              END
+            ELSE
+              IF W1.Value = W2.Value
+              THEN
+                BEGIN
+                  W1.Amount := W1.Amount + W2.Amount;
+                  WRITE(FOut, W1);
+                  W1.Value := '*';
+                  W2.Value := '*'
+                END
         END;
-      InSort := TRUE
-      WHILE (NOT EOF(F1)) AND InSort
-      DO
-        BEGIN
-          IF Word1.Value < Word2.Value
-          THEN
-            BEGIN
-              WRITE(FOut, Word1);
-              READ(F1, Word1)
-            END;
-          IF Word1.Value > Word2.Value
-          THEN
-            BEGIN                                
-              WRITE(FOut, Word2);
-              InSort := FALSE
-            END;
-          IF Word1.Value = Word2.Value
-          THEN
-            BEGIN
-              Word1.Amount := Word1.Amount + Word2.Amount;
-              WRITE(FOut, Word1);
-              READ(F1, Word1);
-              READ(F2, Word2)
-            END;
-        END;
-      {last iteration}
       
-    END
-  ELSE
-    IF Is1Defined
-    THEN
-      BEGIN
-        RESET(F1);
-        CopyTypeFile(F1, FOut)
-      END
-    ELSE
-      IF Is2Defined
+      IF W1.Value <> '*'
       THEN
-        BEGIN
-          RESET(F2);
-          CopyTypeFile(F2, FOut)
-        END;
+        WRITE(FOut, W1);
+      IF W2.Value <> '*'
+      THEN
+        WRITE(FOut, W2);
+      State := 'Copy Tail'
+    END;
+
+  IF State = 'Copy Tail'
+  THEN
+    IF NOT EOF(F1)
+    THEN
+      CopyTypeFile(F1, FOut)
+    ELSE
+      IF NOT EOF(F2)
+      THEN
+        CopyTypeFile(F2, FOut)
 END; {MergeSortFiles}
 
 
@@ -184,9 +170,6 @@ BEGIN {FileTextHandler}
       RESET(FTemp);
       REWRITE(FRes);
       MergeSortFiles(FRes, FWords, FTemp);
-      PrintTree(OUTPUT, WTree);
-      WRITE(OUTPUT, CIterWords);
-      WRITELN(OUTPUT);
       DISPOSE(WTree);
       WTree := TextHandle(FIn)
     END;

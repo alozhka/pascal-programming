@@ -1,7 +1,7 @@
 UNIT TextHandler;
 INTERFACE
 CONST
-  IterationQuantity = 5;
+  IterationQuantity = 250;
 TYPE
   WordHandle = RECORD
     Value: STRING[32];
